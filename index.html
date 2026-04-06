@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>O Forno: o jornal da jornada - por Pedro Lago</title>
+    <title>O Forno: Desincubadora de Projetos &amp; Escola de Planejamento e Gestão</title>
     <meta name="description" content="Linha do tempo: cronograma do futuro + memorial do passado. Produtor cultural, IA e Fornologia." />
     <link rel="icon" type="image/png" href="https://i.postimg.cc/Dzh21XJr/logo-forno-sem-fundo.png" />
     
@@ -11,132 +11,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              background: 'var(--bg-main)',
-              surface: 'var(--bg-surface)',
-              surface2: 'var(--bg-surface2)',
-              surface3: 'var(--bg-surface3)',
-              primary: 'var(--text-primary)',
-              secondary: 'var(--text-secondary)',
-              muted: 'var(--text-muted)',
-              accent: 'var(--accent)',
-              gold: 'var(--gold)',
-              border: 'var(--border-color)',
-              'border-hover': 'var(--border-hover)',
-              'border-dark': 'var(--border-dark)',
-            },
-            fontFamily: {
-              sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-              serif: ['"Playfair Display"', 'serif'],
-              mono: ['"Space Grotesk"', 'monospace'],
-            },
-            spacing: {
-              '128': '32rem',
-            },
-            animation: {
-              'fade-in-up': 'fadeInUp 1s ease-out forwards',
-              'slow-spin': 'spin 12s linear infinite',
-            },
-            keyframes: {
-              fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              }
-            }
-          }
-        }
-      }
-    </script>
-    <style>
-      :root {
-        --bg-main: #0a0a0a;
-        --bg-surface: #111111;
-        --bg-surface2: #080808;
-        --bg-surface3: #1a1a1a;
-        --text-primary: #F2F2F2;
-        --text-secondary: #A3A3A3;
-        --text-muted: #737373;
-        --accent: #333333;
-        --gold: #D4AF37;
-        --border-color: #262626; /* neutral-800 */
-        --border-hover: #525252; /* neutral-600 */
-        --border-dark: #171717; /* neutral-900 */
-        --glass-bg: rgba(10, 10, 10, 0.7);
-        --glass-border: rgba(255, 255, 255, 0.03);
-      }
-
-      html.light {
-        --bg-main: #E6CBB5; /* Skin tone / clay */
-        --bg-surface: #D9BCA3; /* Slightly darker clay */
-        --bg-surface2: #F2D8C2; /* Lighter clay */
-        --bg-surface3: #CCAD91; /* Even darker clay */
-        --text-primary: #3E2723; /* Dark brown */
-        --text-secondary: #5D4037; /* Medium brown */
-        --text-muted: #8D6E63; /* Lighter brown for muted text */
-        --accent: #D84315; /* Fire orange */
-        --gold: #B8860B; /* Dark goldenrod */
-        --border-color: #C2A892; /* Border clay */
-        --border-hover: #A68A73; /* Hover border */
-        --border-dark: #B0957D; /* Darker border */
-        --glass-bg: rgba(230, 203, 181, 0.7);
-        --glass-border: rgba(62, 39, 35, 0.1);
-      }
-
-      body {
-        background-color: var(--bg-main);
-        color: var(--text-primary);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      /* Custom scrollbar for webkit */
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: var(--bg-main);
-      }
-      ::-webkit-scrollbar-thumb {
-        background: var(--accent);
-        border-radius: 3px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--text-secondary);
-      }
-      .glass-nav {
-        background: var(--glass-bg);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-bottom: 1px solid var(--glass-border);
-      }
-      .text-glow {
-        text-shadow: 0 0 20px rgba(255,255,255,0.15);
-      }
-      html.light .text-glow {
-        text-shadow: 0 0 20px rgba(216, 67, 21, 0.3);
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
+    
+    <link rel="stylesheet" href="/index.css">
+  </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>

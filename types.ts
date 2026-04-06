@@ -19,18 +19,12 @@ export interface NavItem {
   action?: boolean;
 }
 
-export type FormType = 'project' | 'talk' | 'jaaas' | 'newsletter';
+export type FormType = 'newsletter' | 'servicos' | 'workshop';
 
 export interface FormData {
   name: string;
   email?: string;
   phone?: string;
   message?: string;
-  projectDetails?: string;
-  budget?: string;
   eventType?: string;
-  date?: string;
-  businessType?: string;
-  challenge?: string;
-  interests?: string[];
 }

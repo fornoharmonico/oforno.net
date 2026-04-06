@@ -1,27 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { FormType, FormData } from '../types';
+import { supabase } from '../lib/supabase';
 
 interface FormProps {
   type: FormType;
   onSubmit: (data: FormData) => void;
+  initialService?: string;
 }
 
-const Forms: React.FC<FormProps> = ({ type, onSubmit }) => {
-  const [formData, setFormData] = useState<FormData>({ name: '' });
+const Forms: React.FC<FormProps> = ({ type, onSubmit, initialService }) => {
+  const [formData, setFormData] = useState<FormData>({ 
+    name: '', 
+    eventType: initialService || '' 
+  });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate submission
-    setTimeout(() => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      // Format data for the leads table
+      const leadData = {
+        name: formData.name,
+        email: formData.email || null,
+        phone: formData.phone || null,
+        event_type: type === 'servicos' ? formData.eventType : type,
+        message: formData.message || null
+      };
+
+      // Determine which table to insert into
+      let tableName = 'servicos';
+      if (type === 'newsletter') tableName = 'newsletter';
+      if (type === 'workshop') tableName = 'workshop_fff';
+
+      const { error: supabaseError } = await supabase
+        .from(tableName)
+        .insert([leadData]);
+
+      if (supabaseError) {
+        throw supabaseError;
+      }
+
       setSubmitted(true);
       onSubmit(formData);
-    }, 1000);
-  };
+    } catch (err: unknown) {
+      console.error('Erro ao enviar formulário:', err);
+      setError('Ocorreu um erro ao enviar sua mensagem. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [formData, type, onSubmit]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
 
   if (submitted) {
     return (
@@ -51,81 +87,54 @@ const Forms: React.FC<FormProps> = ({ type, onSubmit }) => {
         <input required name="email" type="email" className={inputClasses} onChange={handleChange} placeholder="seu@email.com" />
       </div>
 
-      {type === 'project' && (
-        <>
-          <div>
-            <label className={labelClasses}>Nome do Projeto</label>
-            <input required name="projectDetails" type="text" className={inputClasses} onChange={handleChange} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelClasses}>Prazo Estimado</label>
-              <input name="date" type="text" className={inputClasses} onChange={handleChange} placeholder="ex: 3 meses" />
-            </div>
-            <div>
-              <label className={labelClasses}>Orçamento Estimado</label>
-              <input name="budget" type="text" className={inputClasses} onChange={handleChange} placeholder="R$" />
-            </div>
-          </div>
-          <div>
-            <label className={labelClasses}>Detalhes</label>
-            <textarea name="message" rows={4} className={inputClasses} onChange={handleChange} placeholder="Conte mais sobre sua ideia..."></textarea>
-          </div>
-        </>
-      )}
+      <div>
+        <label className={labelClasses}>Telefone / WhatsApp</label>
+        <input required name="phone" type="tel" className={inputClasses} onChange={handleChange} placeholder="(XX) XXXXX-XXXX" />
+      </div>
 
-      {type === 'talk' && (
+      {type === 'servicos' && (
         <>
           <div>
-            <label className={labelClasses}>Tipo de Evento</label>
-            <select name="eventType" className={inputClasses} onChange={handleChange}>
-              <option value="palestra">Palestra</option>
-              <option value="oficina">Oficina</option>
-              <option value="consultoria">Consultoria</option>
+            <label className={labelClasses}>Serviço de Interesse</label>
+            <select name="eventType" className={inputClasses} onChange={handleChange} defaultValue={initialService || ""}>
+              <option value="" disabled>Selecione um serviço</option>
+              <option value="Palestra / Roda de Conversa">Palestra / Roda de Conversa</option>
+              <option value="Oficina / Workshop">Oficina / Workshop</option>
+              <option value="Mentoria">Mentoria</option>
+              <option value="Assessoria">Assessoria</option>
+              <option value="Show">Show</option>
+              <option value="Workshow">Workshow</option>
+              <option value="Saiba mais sobre Fornologia">Saiba mais sobre Fornologia</option>
             </select>
           </div>
           <div>
-            <label className={labelClasses}>Tema de Interesse</label>
-            <input name="message" type="text" className={inputClasses} onChange={handleChange} placeholder="ex: Economia Criativa, IA..." />
+            <label className={labelClasses}>Tema / Detalhes</label>
+            <textarea name="message" rows={4} className={inputClasses} onChange={handleChange} placeholder="Conte mais sobre o que você precisa..."></textarea>
           </div>
         </>
       )}
 
-      {type === 'jaaas' && (
+      {type === 'workshop' && (
         <>
           <div>
-            <label className={labelClasses}>Seu Negócio</label>
-            <input required name="businessType" type="text" className={inputClasses} onChange={handleChange} placeholder="ex: Padaria, Artesanato..." />
-          </div>
-          <div>
-            <label className={labelClasses}>Maior Desafio Atual</label>
-            <textarea name="challenge" rows={3} className={inputClasses} onChange={handleChange} placeholder="O que mais te atrapalha hoje?"></textarea>
-          </div>
-          <div>
-            <label className={labelClasses}>WhatsApp</label>
-            <input required name="phone" type="tel" className={inputClasses} onChange={handleChange} placeholder="(XX) XXXXX-XXXX" />
+            <label className={labelClasses}>Por que você quer participar?</label>
+            <textarea required name="message" rows={4} className={inputClasses} onChange={handleChange} placeholder="Conte um pouco sobre sua expectativa..."></textarea>
           </div>
         </>
       )}
 
-      {type === 'newsletter' && (
-        <>
-          <div>
-            <label className={labelClasses}>Interesse</label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center gap-2 text-secondary">
-                <input type="checkbox" name="interest_book" className="rounded bg-border" /> Livro
-              </label>
-              <label className="flex items-center gap-2 text-secondary">
-                <input type="checkbox" name="interest_news" className="rounded bg-border" /> Newsletter
-              </label>
-            </div>
-          </div>
-        </>
+      {error && (
+        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+          {error}
+        </div>
       )}
 
-      <button type="submit" className={btnClasses}>
-        Enviar
+      <button 
+        type="submit" 
+        className={`${btnClasses} ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'Enviando...' : 'Enviar'}
       </button>
     </form>
   );

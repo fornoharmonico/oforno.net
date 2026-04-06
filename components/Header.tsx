@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Menu, X } from './Icons';
 import { NAV_ITEMS } from '../constants';
 import { NavItem } from '../types';
@@ -11,7 +11,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onNewsletterClick }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleNavClick = (e: React.MouseEvent, item: NavItem) => {
+  const handleNavClick = useCallback((e: React.MouseEvent, item: NavItem) => {
     if (item.external) return; // Let default behavior happen (open in new tab)
     
     e.preventDefault();
@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ onNewsletterClick }) => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }, [onNewsletterClick]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 glass-nav transition-all duration-300">

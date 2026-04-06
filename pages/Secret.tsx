@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, MessageSquare, Rocket } from '../components/Icons';
-import Forms from '../components/Forms';
 
 const Secret: React.FC = () => {
-  const [demoActive, setDemoActive] = useState(false);
   const [messages, setMessages] = useState<{role: 'user' | 'bot', text: string}[]>([
     {role: 'bot', text: 'Olá! Sou Joaquim, o agente virtual d\'O Forno. Como posso ajudar seu negócio hoje?'}
   ]);
@@ -69,21 +67,18 @@ const Secret: React.FC = () => {
           </form>
         </div>
 
-        {/* Lead Form */}
-        <div className="bg-surface border border-border rounded-2xl p-8">
-          <h3 className="text-xl font-bold mb-6 text-center">Criar meu Agente IA</h3>
-          <Forms type="jaaas" onSubmit={(data) => console.log(data)} />
-        </div>
-        
-        <div className="mt-8 text-center">
-            <a 
-              href="https://wa.me/5532988223023?text=Ol%C3%A1%20Joaquim!%20Gostaria%20de%20saber%20mais%20sobre%20o%20Agente%20IA." 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors"
-            >
-              <MessageSquare size={16} /> Falar com Joaquim no WhatsApp
-            </a>
+        {/* Lead Form Removed - Direct to WhatsApp */}
+        <div className="bg-surface border border-border rounded-2xl p-8 text-center">
+          <h3 className="text-xl font-bold mb-6">Criar meu Agente IA</h3>
+          <p className="text-secondary mb-8">Fale diretamente com nossa equipe para criar o seu agente personalizado.</p>
+          <a 
+            href="https://wa.me/5532998344329" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-500 transition-colors font-bold"
+          >
+            <MessageSquare size={20} /> Falar no WhatsApp
+          </a>
         </div>
       </div>
     </div>

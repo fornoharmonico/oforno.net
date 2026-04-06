@@ -1,26 +1,25 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
 import Forms from '../components/Forms';
 import EmbedCard from '../components/EmbedCard';
 import { TIMELINE_DATA, NAV_ITEMS } from '../constants';
 import { FormType } from '../types';
-import { Play, BookOpen, ChevronDown, Lock, Music, Rocket, Users, Mic, Mail, Briefcase, Heart, MessageSquare, Video, ExternalLink, Calendar, MapPin, X } from '../components/Icons';
+import { Play, BookOpen, ChevronDown, Music, Rocket, Users, Mic, Briefcase, MessageSquare, Video, Calendar, MapPin, X } from '../components/Icons';
 
 const Home: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<FormType>('project');
+  const [modalType, setModalType] = useState<FormType>('newsletter');
   const [modalTitle, setModalTitle] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const openModal = (type: FormType, title: string) => {
+  const openModal = useCallback((type: FormType, title: string) => {
     setModalType(type);
     setModalTitle(title);
     setModalOpen(true);
-  };
+  }, []);
 
-  const handleFooterNavClick = (e: React.MouseEvent, item: any) => {
+  const handleFooterNavClick = useCallback((e: React.MouseEvent, item: { external?: boolean; action?: boolean; href?: string }) => {
     if (item.external) return;
 
     e.preventDefault();
@@ -30,11 +29,13 @@ const Home: React.FC = () => {
       return;
     }
 
-    const element = document.querySelector(item.href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (item.href) {
+      const element = document.querySelector(item.href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
-  };
+  }, [openModal]);
 
   return (
     <div className="min-h-screen bg-background text-primary overflow-x-hidden font-sans selection:bg-primary selection:text-background">
@@ -50,7 +51,7 @@ const Home: React.FC = () => {
             <img 
               src="https://i.postimg.cc/4dCphfs1/PEDRO-LAGO-PERFIL.png" 
               alt="" 
-              className="w-full h-full object-cover object-[50%_25%] opacity-40 grayscale"
+              className="w-full h-full object-cover object-[0%_25%] md:object-[50%_25%] opacity-60 contrast-125 grayscale"
               referrerPolicy="no-referrer"
             />
           </div>
@@ -74,22 +75,22 @@ const Home: React.FC = () => {
               alt="O Forno" 
               className="h-32 md:h-48 lg:h-64 w-auto object-contain opacity-90 hidden [.light_&]:block"
             />
+            <p className="text-xs md:text-sm font-sans font-medium tracking-widest text-muted uppercase -mt-4">
+              Desincubadora de Projetos & Escola de Planejamento e Gestão
+            </p>
             <p className="text-xl md:text-2xl font-sans font-light text-secondary tracking-wide">
               Desde 1988, construindo futuros <br/>
               desejáveis, possíveis e viáveis, <br/>
               ainda que improváveis.
             </p>
           </div>
-
-          <div className="max-w-3xl mx-auto space-y-6">
-             <p className="text-lg md:text-xl text-secondary font-serif italic leading-relaxed">
-              "E não sabendo que era impossível, fui lá e fiz!"
-            </p>
-          </div>
           
           <div className="pt-8">
             <button 
-              onClick={() => openModal('project', "Tirar Projeto d'O Forno")}
+              onClick={() => {
+                const element = document.getElementById('quem-somos');
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-primary px-10 font-sans text-sm font-bold uppercase tracking-widest text-background transition-all duration-300 hover:opacity-80 hover:scale-105"
             >
               <span className="mr-2">Confira o que tem n'O Forno</span>
@@ -98,14 +99,23 @@ const Home: React.FC = () => {
           </div>
         </div>
         
-        <a href="#plan2026" className="absolute bottom-12 animate-bounce text-muted hover:text-primary transition-colors">
+        <a href="#quem-somos" onClick={(e) => {
+          e.preventDefault();
+          const element = document.getElementById('quem-somos');
+          if (element) element.scrollIntoView({ behavior: 'smooth' });
+        }} className="absolute bottom-12 animate-bounce text-muted hover:text-primary transition-colors">
           <ChevronDown size={24} strokeWidth={1} />
         </a>
       </section>
 
       {/* QUEM SOU EU & O QUE É O FORNO */}
-      <section className="py-24 border-t border-border-dark/50 bg-surface2">
+      <section id="quem-somos" className="py-24 border-t border-border-dark/50 bg-surface2">
         <div className="container mx-auto px-6 max-w-6xl">
+          <div className="max-w-3xl mx-auto text-center mb-20">
+             <p className="text-2xl md:text-3xl text-primary font-serif italic leading-relaxed">
+              "E não sabendo que era impossível, fui lá e fiz!"
+            </p>
+          </div>
           <div className="grid md:grid-cols-2 gap-16 md:gap-24">
             
             {/* Quem Sou Eu */}
@@ -118,6 +128,7 @@ const Home: React.FC = () => {
                 <img 
                   src="https://i.postimg.cc/4dCphfs1/PEDRO-LAGO-PERFIL.png" 
                   alt="Pedro Lago" 
+                  loading="lazy"
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-border"
                   referrerPolicy="no-referrer"
                 />
@@ -125,7 +136,7 @@ const Home: React.FC = () => {
               </div>
               <div className="space-y-4 text-secondary font-light leading-relaxed">
                 <p>
-                  Sou o Pedro, filho de Lis Beth e Leon Lago, companheiro da Géssica e pai da Bárbara. Poeta, músico, compositor e gestor cultural, há mais de uma década venho idealizando, viabilizando e realizando projetos sociocriativos, artísticos e culturais com a ajuda da Fornologia: a metodologia de planejamento e gestão de projetos que criamos para ajudar pessoas, empresas e organizações a "tirar seus projetos d'O Forno".
+                  Sou o Pedro, filho de Lis Beth e Leon Lago, companheiro da Géssica e pai da Bárbara. Poeta, músico, compositor e gestor cultural, há mais de uma década venho idealizando, viabilizando e realizando dezenas de projetos sociocriativos, artísticos e culturais com a ajuda da Fornologia: a metodologia de planejamento e gestão de projetos que criamos para ajudar pessoas, empresas e organizações a "tirar seus projetos d'O Forno".
                 </p>
               </div>
             </div>
@@ -136,18 +147,64 @@ const Home: React.FC = () => {
                 <span className="w-8 h-[1px] bg-border"></span>
                 O que é O Forno
               </h2>
-              <h3 className="text-3xl md:text-4xl font-serif italic text-primary mb-6">Formidável Fábrica de Futuros</h3>
+              <div className="flex items-center gap-6 mb-6">
+                <div className="w-20 h-20 md:w-24 md:h-24 shrink-0">
+                  <img 
+                    src="https://i.postimg.cc/RhpFKdKb/LOGO-FORNO-branco-sem-fundo.png" 
+                    alt="O Forno" 
+                    loading="lazy"
+                    className="w-full h-full object-contain block [.light_&]:hidden"
+                    referrerPolicy="no-referrer"
+                  />
+                  <img 
+                    src="https://i.postimg.cc/Dzh21XJr/logo-forno-sem-fundo.png" 
+                    alt="O Forno" 
+                    loading="lazy"
+                    className="w-full h-full object-contain hidden [.light_&]:block"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <h3 className="text-3xl md:text-4xl font-serif italic text-primary">Formidável Fábrica de Futuros</h3>
+              </div>
               <div className="space-y-4 text-secondary font-light leading-relaxed">
                 <p>
-                  O Forno é mais do que uma produtora; é uma desincubadora de projetos e uma escola de planejamento e gestão cultural. Um espaço onde projetos nascem, ganham forma e são viabilizados com criatividade, amor à arte e visão estratégica.
-                </p>
-                <p>
-                  Nosso propósito é descomplicar a gestão cultural, oferecendo suporte desde a concepção da ideia até a sua execução final, auxiliando que cada projeto e cada pessoa alcance seu máximo potencial.
+                  O Forno é mais do que uma produtora; é uma desincubadora de projetos e uma escola de planejamento e gestão cultural. Nosso propósito é descomplicar o planejamento e a gestão de projetos, oferecendo metodologia, tecnologia e suporte desde a concepção da ideia até a sua execução. Auxiliamos pessoas, empresas e organizações a realizar seus sonhos e projetos gerando resultados e impactos mensuráveis.
                 </p>
               </div>
             </div>
 
           </div>
+
+          <div className="mt-32 mb-12 relative">
+            <span className="font-sans text-xs font-semibold text-muted tracking-[0.2em] uppercase absolute -top-8 left-0">O SONHO</span>
+            <h2 className="text-[120px] md:text-[200px] font-sans font-bold text-primary opacity-[0.03] absolute -left-4 -top-20 md:-top-32 select-none pointer-events-none leading-none">2026</h2>
+            <h2 className="text-5xl md:text-7xl font-serif italic mb-12 relative z-10 text-primary">Feliz Plano Novo</h2>
+            
+            {/* Vision / Mission / Dream Grid */}
+            <div className="grid md:grid-cols-3 gap-8 mb-16 relative z-10">
+              <div className="bg-surface border border-border p-8 rounded-xl hover:border-border-hover transition-colors duration-300">
+                <h3 className="text-xl font-serif italic text-primary mb-4">Sonho</h3>
+                <p className="text-secondary font-light text-sm leading-relaxed">
+                  O sonho é antigo: transformar cultura em desenvolvimento ajudando pessoas, empresas e organizações a tirar seus projetos do Forno.
+                </p>
+              </div>
+              
+              <div className="bg-surface border border-border p-8 rounded-xl hover:border-border-hover transition-colors duration-300">
+                <h3 className="text-xl font-serif italic text-primary mb-4">Missão</h3>
+                <p className="text-secondary font-light text-sm leading-relaxed">
+                  Nossa missão é descomplicar o planejamento estratégico e a gestão de projetos.
+                </p>
+              </div>
+
+              <div className="bg-surface border border-border p-8 rounded-xl hover:border-border-hover transition-colors duration-300">
+                <h3 className="text-xl font-serif italic text-primary mb-4">Visão</h3>
+                <p className="text-secondary font-light text-sm leading-relaxed">
+                  Nossa visão de futuro é consolidar O Forno como referência regional em inovação e produção cultural no Campo das Vertentes.
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -168,22 +225,22 @@ const Home: React.FC = () => {
                 FFF - Formidável Fábrica de Futuros
               </h2>
               <p className="text-secondary text-lg leading-relaxed font-light mb-8">
-                Como transformar um sonho ou uma ideia em um plano bem estruturado? Como viabilizar este plano e tirar um projeto do Forno? Conheça a Fornologia e descomplique o planejamento e gestão de seus projetos. Faça sua inscrição para fazer parte da próxima turma do workshop "Formidável Fábrica de Futuros"
+                Como transformar um sonho ou uma ideia em um plano bem estruturado? Como viabilizar este plano, transformando intenção em ação? Conheça a Fornologia - a arte e ciência de tirar projetos do Forno! Vamos descomplicar o planejamento e gestão de seus projetos. Faça sua inscrição para fazer parte da próxima turma do workshop "Formidável Fábrica de Futuros"
               </p>
               
               <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-10">
-                <div className="flex items-center gap-3 text-background bg-primary px-6 py-3 rounded-full shadow-lg">
-                  <Calendar size={18} className="text-background" />
-                  <span className="font-sans text-sm tracking-wide"><strong>Quando?</strong> 7 a 9 de abril, das 19 as 22 horas.</span>
+                <div className="flex items-center gap-3 text-secondary bg-background border border-border px-6 py-3 rounded-xl">
+                  <Calendar size={18} className="text-primary" />
+                  <span className="font-sans text-sm tracking-wide">7 a 9 de abril, das 19 as 22 horas.</span>
                 </div>
-                <div className="flex items-center gap-3 text-background bg-primary px-6 py-3 rounded-full shadow-lg">
-                  <MapPin size={18} className="text-background" />
-                  <span className="font-sans text-sm tracking-wide"><strong>Onde?</strong> Ao vivo e online por video-conferência.</span>
+                <div className="flex items-center gap-3 text-secondary bg-background border border-border px-6 py-3 rounded-xl">
+                  <MapPin size={18} className="text-primary" />
+                  <span className="font-sans text-sm tracking-wide">Ao vivo e online por video-conferência.</span>
                 </div>
               </div>
 
               <button 
-                onClick={() => openModal('newsletter', 'Inscrição: Workshop FFF')}
+                onClick={() => openModal('workshop', 'Inscrição: Workshop FFF')}
                 className="inline-flex items-center justify-center h-14 px-10 rounded-full bg-primary text-background font-sans text-sm font-bold uppercase tracking-widest hover:opacity-80 hover:scale-105 transition-all duration-300"
               >
                 Inscrever-me
@@ -279,7 +336,7 @@ const Home: React.FC = () => {
 
               <div className="text-center">
                 <button 
-                  onClick={() => openModal('newsletter', 'Inscrição: Workshop FFF')}
+                  onClick={() => openModal('workshop', 'Inscrição: Workshop FFF')}
                   className="inline-flex items-center justify-center h-14 px-10 rounded-full bg-transparent border border-primary text-primary font-sans text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-background hover:scale-105 transition-all duration-300"
                 >
                   Garantir Minha Vaga
@@ -299,11 +356,11 @@ const Home: React.FC = () => {
               <div className="max-w-2xl">
                 <h3 className="text-4xl font-serif italic mb-6">Fornologia: O Método</h3>
                 <p className="text-secondary text-lg leading-relaxed font-light">
-                  A arte e a ciência da Fornologia, a teoria e a prática de tirar projetos do Forno. Inspirada no DragonDreaming, no TEvEP e na Fluxonomia, mixados, masterizados e calibrados em mais de 12 anos de pesquisa e ação. Sonha, amassa e assa!
+                  A arte e a ciência da Fornologia, a teoria e a prática de tirar projetos do Forno, transformando sonhos em projetos, intenções em ações. Inspirada no DragonDreaming, no TEvEP e na Fluxonomia 4D, mixados, masterizados e calibrados em mais de 12 anos de pesquisa, ação e experimentação!
                 </p>
               </div>
               <button 
-                onClick={() => openModal('talk', 'Saiba mais sobre Fornologia')}
+                onClick={() => openModal('servicos', 'Saiba mais sobre Fornologia')}
                 className="px-8 py-4 border border-primary text-primary font-sans font-bold text-xs uppercase tracking-widest hover:bg-primary hover:text-background transition-all whitespace-nowrap"
               >
                 Conheça o Método
@@ -319,35 +376,101 @@ const Home: React.FC = () => {
             </div>
           </div>
 
-          <div className="mb-24 relative">
-            <span className="font-sans text-xs font-semibold text-muted tracking-[0.2em] uppercase absolute -top-8 left-0">O SONHO</span>
-            <h2 className="text-[120px] md:text-[200px] font-sans font-bold text-primary opacity-[0.03] absolute -left-4 -top-20 md:-top-32 select-none pointer-events-none leading-none">2026</h2>
-            <h2 className="text-5xl md:text-7xl font-serif italic mb-12 relative z-10 text-primary">Feliz Plano Novo</h2>
-            
-            {/* Vision / Mission / Dream Grid */}
-            <div className="grid md:grid-cols-3 gap-8 mb-16 relative z-10">
-              <div className="bg-surface border border-border p-8 rounded-xl hover:border-border-hover transition-colors duration-300">
-                <h3 className="text-xl font-serif italic text-primary mb-4">Sonho</h3>
-                <p className="text-secondary font-light text-sm leading-relaxed">
-                  O sonho é antigo: transformar cultura em desenvolvimento ajudando pessoas, empresas e organizações a tirar seus projetos do Forno.
-                </p>
-              </div>
-              
-              <div className="bg-surface border border-border p-8 rounded-xl hover:border-border-hover transition-colors duration-300">
-                <h3 className="text-xl font-serif italic text-primary mb-4">Missão</h3>
-                <p className="text-secondary font-light text-sm leading-relaxed">
-                  Nossa missão é descomplicar o planejamento estratégico e a gestão de projetos.
-                </p>
-              </div>
-
-              <div className="bg-surface border border-border p-8 rounded-xl hover:border-border-hover transition-colors duration-300">
-                <h3 className="text-xl font-serif italic text-primary mb-4">Visão</h3>
-                <p className="text-secondary font-light text-sm leading-relaxed">
-                  Nossa visão de futuro é consolidar O Forno como referência regional em inovação e produção cultural no Campo das Vertentes.
-                </p>
-              </div>
+          {/* NOSSOS SERVIÇOS (Moved here) */}
+          <div id="contact" className="mb-32 pt-12 border-t border-border">
+            <div className="mb-16 text-center">
+               <h2 className="text-5xl md:text-6xl font-serif font-medium text-primary">Nossos serviços:</h2>
             </div>
 
+            <div className="grid md:grid-cols-2 gap-px bg-border border border-border overflow-hidden">
+              
+              {/* 1. Palestra / Roda de Conversa */}
+              <button 
+                onClick={() => openModal('servicos', 'Palestra / Roda de Conversa')}
+                className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
+              >
+                <Mic size={32} strokeWidth={1} className="text-muted group-hover:text-yellow-500 transition-colors" />
+                <div>
+                  <h3 className="text-3xl font-serif italic mb-4 text-primary">Palestra / Roda de Conversa</h3>
+                  <p className="text-muted font-light group-hover:text-secondary">Convide Pedro para uma roda de conversa ou palestra sobre gestão de projetos: "Descomplicando o planejamento com a Fornologia: a arte e a ciência de tirar projetos do Forno."</p>
+                </div>
+              </button>
+
+              {/* 2. Oficina / Workshop */}
+              <button 
+                onClick={() => openModal('servicos', 'Oficina / Workshop')}
+                className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
+              >
+                <BookOpen size={32} strokeWidth={1} className="text-muted group-hover:text-pink-500 transition-colors" />
+                <div>
+                  <h3 className="text-3xl font-serif italic mb-4 text-primary">Oficina / Workshop</h3>
+                  <p className="text-muted font-light group-hover:text-secondary">Participe da próxima edição da Formidável Fábrica de Futuros. Um minicurso intensivo de planejamento estratégico que une arte e ciência; teoria e prática; sonho e projeto, intenção e ação.</p>
+                </div>
+              </button>
+
+              {/* 3. Mentoria */}
+              <button 
+                onClick={() => openModal('servicos', 'Mentoria')}
+                className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
+              >
+                <Users size={32} strokeWidth={1} className="text-muted group-hover:text-blue-500 transition-colors" />
+                <div>
+                  <h3 className="text-3xl font-serif italic mb-4 text-primary">Mentoria</h3>
+                  <p className="text-muted font-light group-hover:text-secondary">Contrate nosso acompanhamento personalizado e conte com o apoio da nossa metodologia e tecnologia de planejamento e gestão da vida pessoal e profissional. Seja para gerir a vida pessoal, a carreira ou um projeto específico, a Fornologia pode te ajudar.</p>
+                </div>
+              </button>
+
+              {/* 4. Assessoria */}
+              <button 
+                onClick={() => openModal('servicos', 'Assessoria')}
+                className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
+              >
+                <Briefcase size={32} strokeWidth={1} className="text-muted group-hover:text-purple-500 transition-colors" />
+                <div>
+                  <h3 className="text-3xl font-serif italic mb-4 text-primary">Assessoria</h3>
+                  <p className="text-muted font-light group-hover:text-secondary">Contrate nossos serviços de planejamento estratégico, elaboração de projetos, captação de recursos ou assessoria de comunicação integrada. Conte com mais de uma década de experiências idealizando, viabilizando e realizando projetos sociocriativos.</p>
+                </div>
+              </button>
+
+              {/* 5. Show */}
+              <button 
+                onClick={() => openModal('servicos', 'Show')}
+                className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
+              >
+                <Music size={32} strokeWidth={1} className="text-muted group-hover:text-green-500 transition-colors" />
+                <div>
+                  <h3 className="text-3xl font-serif italic mb-4 text-primary">Show</h3>
+                  <p className="text-muted font-light group-hover:text-secondary">Uma apresentação intimista que mistura voz, violão, poesia e canção, Pedro apresenta as composições do álbum Ode à Felicidade, mescladas com Uaikais (haikais mineiros) e clássicos da MPB. No repertório, canções de mestres que o influenciam como Gilberto Gil, Djavan, Marcelo Camelo e Luis Tatit.</p>
+                </div>
+              </button>
+
+              {/* 6. Workshow */}
+              <button 
+                onClick={() => openModal('servicos', 'Workshow')}
+                className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
+              >
+                <Play size={32} strokeWidth={1} className="text-muted group-hover:text-red-500 transition-colors" />
+                <div>
+                  <h3 className="text-3xl font-serif italic mb-4 text-primary">Workshow</h3>
+                  <p className="text-muted font-light group-hover:text-secondary">O workshow é um combo. Oferece em uma mesma experiência a palestra, o workshop e o show. Inspirado no conceito de Ócio Criativo (De Masi), a intenção é que os participantes não saibam se estão aprendendo, trabalhando ou se divertindo.</p>
+                </div>
+              </button>
+            </div>
+
+            <div className="mt-20 text-center">
+               <a 
+                href="https://wa.me/5532998344329"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-primary px-10 font-sans font-bold text-base text-background transition-all duration-300 hover:opacity-80 hover:scale-105"
+              >
+                <span className="mr-3">Fale Conosco</span>
+                <Rocket size={20} className="transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1" />
+              </a>
+            </div>
+          </div>
+
+          <div className="mb-24 relative">
             <div className="text-lg text-secondary font-light max-w-4xl ml-1 leading-relaxed border-l-2 border-border pl-6 py-2">
               <h3 className="text-2xl md:text-3xl font-serif text-primary mb-2">
                 Prospectiva 2026 & Retrospectiva 2025-1988:
@@ -379,7 +502,7 @@ const Home: React.FC = () => {
                     <span className="inline-block mb-3 px-2 py-1 bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-widest border border-green-500/20 rounded-md">Álbum Disponível</span>
                     <h4 className="text-3xl font-serif italic text-primary mb-2">Ode à Felicidade</h4>
                     <p className="text-secondary font-light mb-6 text-sm leading-relaxed max-w-sm">
-                      Gravado em 2023, o álbum é fruto do encontro e amizade entre Pedro Lago e Felix Rieder, que reuniu seus amigos do JazzClub Koblenz para formar a "Pedra, Barro e Madeira Tribo" (@pbmtribus).
+                      Gravado em 2023 na Alemanha com a "Pedra, Barro e Madeira Tribo" (@pbmtribus), o álbum é fruto do encontro e amizade entre Pedro Lago e Felix Rieder, com participações especiais de Tom Rieder nos sopros, Alex Zotz no baixo e Noah Allmann no piano.
                     </p>
                     <a 
                         href="https://oforno.bandcamp.com/" 
@@ -480,14 +603,14 @@ const Home: React.FC = () => {
                 </div>
 
                 <p className="text-secondary mb-8 leading-relaxed font-light">
-                  "Um encontro da sabedoria popular das montanhas de Minas Gerais com a beleza da forma fixa japonesa do haikai."
+                  "Um encontro da forma fixa e da arte poética japonesa com o jeitinho mineiro de ser e ver a vida. O projeto para a impressão e publicação está em fase de captação de recursos. Você pode registrar seu interesse, receber uma degustação (alerta de spoiler) e ser um dos primeiros a saber quando o livro for oficialmente publicado."
                 </p>
               </div>
               <button 
                 onClick={() => openModal('newsletter', 'Pré-Registro: Haikai, Uai!')}
                 className="w-full bg-primary text-background hover:opacity-80 font-sans font-bold text-xs uppercase tracking-widest py-4 transition-colors"
               >
-                Pré-registrar interesse
+                Registrar interesse
               </button>
             </div>
           </div>
@@ -498,10 +621,10 @@ const Home: React.FC = () => {
                 <EmbedCard 
                   type="youtube" 
                   directLink="https://www.youtube.com/watch?v=HjWeQGqm_Xg"
-                  title="Show: Pedra, Barro e Madeira Trio (ao vivo) no Teatro Municipal de São João del Rei"
+                  title="Show: Pedra, Barro e Madeira Trio"
                 />
                 <div className="mt-6 border-l border-border pl-4 transition-all group-hover:border-primary">
-                  <h4 className="font-serif text-2xl italic mb-2 text-primary">Show: Pedra, Barro e Madeira Trio (ao vivo) no Teatro Municipal de São João del Rei</h4>
+                  <h4 className="font-serif text-2xl italic mb-2 text-primary">Show: Pedra, Barro e Madeira Trio</h4>
                   <p className="text-secondary font-light leading-relaxed">
                     Em 15 de agosto de 2025, o InovaSons das Gerais reuniu compositores locais para uma mostra das composições autorais que brotam das Vertentes. O evento foi produzido pel'O Forno em parceria com o El Nino Estudio Lab! Criativo, com o apoio da Secretaria de Cultura e Turismo de São João del Rei, no Teatro Municipal da cidade, graças aos recursos da Lei Aldir Blanc 2!
                   </p>
@@ -582,6 +705,7 @@ const Home: React.FC = () => {
                   <img 
                     src="https://i.postimg.cc/4dz4c3yk/jaas-sa-(1).png" 
                     alt="JAAAS IA" 
+                    loading="lazy"
                     className="w-64 h-64 object-contain cursor-pointer hover:scale-110 transition-transform duration-500"
                     onClick={() => setSelectedImage("https://i.postimg.cc/4dz4c3yk/jaas-sa-(1).png")}
                   />
@@ -650,6 +774,7 @@ const Home: React.FC = () => {
                       <img 
                         src="https://i.postimg.cc/4dCphfs1/PEDRO-LAGO-PERFIL.png" 
                         alt="Pedro Lago" 
+                        loading="lazy"
                         className="w-32 h-32 md:w-48 md:h-48 rounded-2xl object-cover border border-border shadow-xl shrink-0"
                         referrerPolicy="no-referrer"
                       />
@@ -661,14 +786,6 @@ const Home: React.FC = () => {
                         <p className="text-secondary leading-relaxed font-light text-lg mb-6">
                           Em 12 anos de atividade, O Forno Harmônico já idealizou, realizou e apoiou dezenas de eventos artísticos, culturais e formativos. A missão d'O Forno é ajudar pessoas e empresas a tirar ideias do papel, sonhos da cabeça e projetos do Forno.
                         </p>
-                         <a 
-                            href="http://abre.ai/pedrolago" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-primary border-b border-primary border-opacity-30 hover:border-primary pb-1 transition-all text-xs font-bold uppercase tracking-widest"
-                        >
-                            Minibiografia completa <ExternalLink size={12} />
-                        </a>
                       </div>
                     </div>
                 </div>
@@ -677,96 +794,97 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. CTAS FINAIS */}
-      <section id="contact" className="py-32">
+      {/* IMPRENSA */}
+      <section id="imprensa" className="py-32 bg-surface2">
         <div className="container mx-auto px-6 max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-px bg-border border border-border overflow-hidden">
-            
-            {/* 1. Projeto d'O Forno */}
-            <button 
-              onClick={() => openModal('project', "Tirar Projeto d'O Forno")}
-              className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
-            >
-              <Rocket size={32} strokeWidth={1} className="text-muted group-hover:text-green-500 transition-colors" />
-              <div>
-                <h3 className="text-3xl font-serif italic mb-4 text-primary">Tirar Projeto d'O Forno!</h3>
-                <p className="text-muted font-light group-hover:text-secondary">Tem uma ideia na cabeça? Um sonho no coração? Fale conosco e vamos tirar esse projeto d'O Forno!</p>
-              </div>
-            </button>
-
-            {/* 2. Joaquim IA */}
-            <a 
-              href="https://wa.me/5532988223023?text=Ol%C3%A1%20Joaquim!"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
-            >
-              <MessageSquare size={32} strokeWidth={1} className="text-muted group-hover:text-gold transition-colors" />
-              <div>
-                <h3 className="text-3xl font-serif italic mb-4 text-primary">Fale com o Joaquim!</h3>
-                <p className="text-muted font-light group-hover:text-secondary">A eficiência da I.A. com a inteligência mineira! Fale agora com seu assistente pessoal no WhatsApp.</p>
-              </div>
-            </a>
-
-            {/* 3. Palestra */}
-            <button 
-              onClick={() => openModal('talk', 'Palestra / Roda de Conversa')}
-              className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
-            >
-              <Mic size={32} strokeWidth={1} className="text-muted group-hover:text-yellow-500 transition-colors" />
-              <div>
-                <h3 className="text-3xl font-serif italic mb-4 text-primary">Palestra / Roda de Conversa</h3>
-                <p className="text-muted font-light group-hover:text-secondary">Quero convidar o Pedro para um "café"!</p>
-              </div>
-            </button>
-
-            {/* 4. Oficina */}
-            <button 
-              onClick={() => openModal('talk', 'Oficina / Workshop')}
-              className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
-            >
-              <BookOpen size={32} strokeWidth={1} className="text-muted group-hover:text-pink-500 transition-colors" />
-              <div>
-                <h3 className="text-3xl font-serif italic mb-4 text-primary">Oficina / Workshop</h3>
-                <p className="text-muted font-light group-hover:text-secondary">Quero convidar o Pedro para uma oficina ou workshop!</p>
-              </div>
-            </button>
-
-             {/* 5. Mentoria */}
-            <button 
-              onClick={() => openModal('talk', 'Mentoria / Assessoria')}
-              className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
-            >
-              <Briefcase size={32} strokeWidth={1} className="text-muted group-hover:text-purple-500 transition-colors" />
-              <div>
-                <h3 className="text-3xl font-serif italic mb-4 text-primary">Mentorias e Assessorias</h3>
-                <p className="text-muted font-light group-hover:text-secondary">Quero contratar os serviços do Forno!</p>
-              </div>
-            </button>
-
-            {/* 6. Falar com Pedro (WhatsApp Link) */}
-            <a 
-              href="https://wa.me/5532998344329?text=Ol%C3%A1%20Pedro!%20Vim%20pelo%20site%20O%20Forno."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-background hover:bg-surface p-12 text-left transition-colors duration-300 flex flex-col justify-between h-80"
-            >
-              <Mail size={32} strokeWidth={1} className="text-muted group-hover:text-primary transition-colors" />
-              <div>
-                <h3 className="text-3xl font-serif italic mb-4 text-primary">Falar com Pedro</h3>
-                <p className="text-muted font-light group-hover:text-secondary">Contato direto via WhatsApp ou E-mail (pedro@oforno.studio).</p>
-              </div>
-            </a>
+          <div className="mb-24 relative">
+            <span className="font-sans text-xs font-semibold text-muted tracking-[0.2em] uppercase absolute -top-8 left-0">CONTATO OFICIAL</span>
+            <h2 className="text-[120px] md:text-[200px] font-sans font-bold text-primary opacity-[0.03] absolute -left-4 -top-20 md:-top-32 select-none pointer-events-none leading-none">MÍDIA</h2>
+            <h2 className="text-5xl md:text-7xl font-serif italic mb-4 relative z-10 text-primary">Imprensa</h2>
+            <p className="text-lg text-secondary font-light ml-1">Meios de contato oficial com O Forno e clipping na mídia.</p>
           </div>
 
-          <div className="mt-20 text-center">
-             <button 
-              onClick={() => openModal('project', "Tirar Projeto d'O Forno")}
-              className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-primary px-10 font-sans font-bold text-base text-background transition-all duration-300 hover:opacity-80 hover:scale-105"
-            >
-              <span className="mr-3">Quero tirar meu projeto d'O Forno!</span>
-              <Rocket size={20} className="transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1" />
-            </button>
+          <div className="grid md:grid-cols-2 gap-16">
+            {/* Contatos */}
+            <div>
+              <h3 className="text-2xl font-serif text-primary mb-8 border-b border-border pb-4">O Forno</h3>
+              <ul className="space-y-6 text-secondary font-light text-lg">
+                <li className="flex items-center gap-4">
+                  <span className="w-1.5 h-1.5 bg-muted rounded-full"></span>
+                  <strong>Whatsapp:</strong> <a href="https://wa.me/5532998344329" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">+55 32 998344329</a>
+                </li>
+                <li className="flex items-center gap-4">
+                  <span className="w-1.5 h-1.5 bg-muted rounded-full"></span>
+                  <strong>E-mail:</strong> <a href="mailto:oforno.net@gmail.com" className="hover:text-primary transition-colors">oforno.net@gmail.com</a>
+                </li>
+                <li className="flex items-center gap-4">
+                  <span className="w-1.5 h-1.5 bg-muted rounded-full"></span>
+                  <strong>Instagram O Forno:</strong> <a href="https://www.instagram.com/fornoharmonico" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">@fornoharmonico</a>
+                </li>
+                <li className="flex items-center gap-4">
+                  <span className="w-1.5 h-1.5 bg-muted rounded-full"></span>
+                  <strong>YouTube:</strong> <a href="https://www.youtube.com/@oforno/videos" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">@oforno</a>
+                </li>
+              </ul>
+
+              <h3 className="text-2xl font-serif text-primary mb-8 mt-16 border-b border-border pb-4">Pedro Lago</h3>
+              <ul className="space-y-6 text-secondary font-light text-lg">
+                <li className="flex items-center gap-4">
+                  <span className="w-1.5 h-1.5 bg-muted rounded-full"></span>
+                  <strong>Instagram pessoal:</strong> <a href="https://www.instagram.com/pedrolagopedro" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">@pedrolagopedro</a>
+                </li>
+                <li className="flex items-center gap-4">
+                  <span className="w-1.5 h-1.5 bg-muted rounded-full"></span>
+                  <strong>E-mail pessoal:</strong> <a href="mailto:emaildopedrolago@gmail.com" className="hover:text-primary transition-colors">emaildopedrolago@gmail.com</a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Clipping */}
+            <div>
+              <h3 className="text-2xl font-serif text-primary mb-8 border-b border-border pb-4">Coletânea de Reportagens na mídia</h3>
+              <div className="space-y-6 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
+                {[
+                  { title: "Festival de Música das Vertentes 2021 abre inscrições", link: "https://globoplay.globo.com/v/9489220/" },
+                  { title: "Minas Arte em Casa - Grupo Forno Harmônico homenageia poeta Oscar José Medeiros Jr. (17.09.2020)", link: "https://www.almg.gov.br/acompanhe/noticias/arquivos/2020/09/10_release_minas_arte_em_casa_setima_semana.html" },
+                  { title: "Semana cultural terá música espanhola e homenagem a poeta (10.09.2020)", link: "https://www.almg.gov.br/acompanhe/noticias/arquivos/2020/09/10_release_minas_arte_em_casa_setima_semana.html" },
+                  { title: "“Critt na Quarentena” discute impacto nas empresas causado pelo novo coronavírus (08.09.2020)", link: "https://www2.ufjf.br/noticias/2020/09/08/critt-na-quarentena-discute-impacto-nas-empresas-causado-pelo-novo-coronavirus/" },
+                  { title: "Laboratório de Arte Pública da UFSJ tem novo site (14.07.2020)", link: "https://www.ufsj.edu.br/noticias_ler.php?codigo_noticia=8063" },
+                  { title: "Studio Dialeto realiza 2° Encontro de Empreendedorismo Sustentável (06.06.2020)", link: "http://www.studiodialeto.com.br/studio-dialeto-realiza-2-encontro-de-empreendedorismo-sustentavel-de-juiz-de-fora-online/" },
+                  { title: "CONCERTO ENCERRA MUSIK EXPEDITION (31.08.2019)", link: "https://www.portalamirt.com.br/gazeta-sjdr/concerto-encerra-musik-expedition-2/" },
+                  { title: "MUSIK-EXPEDITION BUSCA COLABORAÇÕES PARA REALIZAR FESTIVAL DE MÚSICA (04.08.2019)", link: "https://www.portalamirt.com.br/gazeta-sjdr/musik-expedition-busca-colaboracoes-para-realizar-festival-de-musica/" },
+                  { title: "Inverno Cultural da UFSJ terá nove dias de programação gratuita (08.07.2019)", link: "https://www.acessa.com/cultura/arquivo/noticias/2019/07/08-inverno-cultural-ufsj-tera-nove-dias-programacao-gratuita/" },
+                  { title: "Inverno Cultural UFSJ lança programação 2019 (05.07.2019)", link: "http://guiadasvertentes.com.br/index.php?secao=ver_noticia&id_noticia=938" },
+                  { title: "Inverno Cultural UFSJ 2019", link: "https://www.minasgerais.com.br/pt/eventos/sao-joao-del-rei/inverno-cultural-ufsj-2019" },
+                  { title: "Palestra: Planejamento e Gestão de Projetos para o II CIRCUITO DE VIOLÃO DAS VERTENTES (31.10.2018)", link: "https://assoviovertentes.wordpress.com/2018/10/31/alteracao-na-programacao-ultima-semana-ii-circuito-de-violao-das-vertentes/" },
+                  { title: "MUSIK-Expedition 2018 começa nesta segunda feira (05.08.2018)", link: "http://jornalismo.ufsj.edu.br/van/musik-expedition-2018-comeca-nesta-segunda-feira/" },
+                  { title: "“Felicidade Sem Domínio”, o poeta e violonista Pedro Lago, também conhecido como palhaço Sinhé, faz uma apresentação que mistura música, poesia e contação de histórias (25.05.2018)", link: "https://www.hojeemdia.com.br/esportes/rock-chopp-e-food-trucks-o-encerramento-do-1%C2%BA-torneio-de-t%C3%AAnis-intercondom%C3%ADnios-1.624580/tenis-1.624587" },
+                  { title: "Cine no Muro 8ª ed. São João del Rei (06.04.2017)", link: "https://saojoaodelreitransparente.com.br/events/view/6581" },
+                  { title: "Semana da Economia Colaborativa acontece em SJDR (09.05.2016)", link: "https://jornalismo.ufsj.edu.br/van/semana-da-economia-colaborativa-acontece-em-sjdr/" },
+                  { title: "G1: Festival Musik Expedition começa em São João del Rei (2016)", link: "http://g1.globo.com/minas-gerais/videos/t/todos-os-videos/v/festival-musik-expedition-comeca-em-sao-joao-del-rei/5241369/" },
+                  { title: "Planejamento e discussão de projetos – Pedro Lago (26/04/2016)", link: "http://www.arteesustentabilidade.com/inicio/planejamento-e-discussao-de-projetos-pedro-lago" },
+                  { title: "Economia criativa na pauta de sábado do Centro Cultural (14.04.2016)", link: "https://ufsj.edu.br/noticias_ler.php?codigo_noticia=5692" },
+                  { title: "Conselheiro Lafaiete vai ter atividades culturais em julho (29.06.2015)", link: "https://www.em.com.br/app/noticia/especiais/festivais-de-inverno/2015/06/29/noticia_festivais_de_inverno,663029/programacao-conselheiro-lafaiete.shtml" },
+                  { title: "São João del-Rei quer ser reconhecida como Cidade Criativa da Música (11.03.2015)", link: "https://www.jornaldaslajes.com.br/integra/sao-joao-del-rei-quer-ser-reconhecida-como-cidade-criativa-da-musica/1595/" },
+                  { title: "Anunciados finalistas do Concurso de Marchinha de São João del Rei (28.02.2014)", link: "http://g1.globo.com/mg/zona-da-mata/carnaval/2014/noticia/2014/02/anunciados-finalistas-do-concurso-de-marchinha-de-sao-joao-del-rei.html" },
+                  { title: "Criatividade e Desenvolvimento: a cidade e suas vocações com Pedro Lago (16.07.2014)", link: "https://setelagoas.com.br/noticias/cidade/25686-oficinas-do-27o-inverno-cultural-tem-prazo-de-inscricoes-prorrogado-ate-a-proxima-quinta-dia-17" },
+                  { title: "Pão de Queijo on the Road se apresenta na Festa da Música de Niterói (10.09.2011)", link: "http://www.gazetanit.com.br/6/festa.htm" },
+                  { title: "Pão de Queijo on the Road participa do Festival Wouldstop III em (27.06.2011)", link: "http://absintomuitorock.blogspot.com/2011/06/ultima-seletiva-do-wouldstop-iii.html?m=0" },
+                  { title: "Pão de Queijo on the Road se apresenta na Edição Nacional do IV BH Indie Music (28.09.2010)", link: "http://ivbhindiemusic.blogspot.com/2010/09/matriz-de-30set-02out-edicao-nacional.html" }
+                ].map((item, idx) => (
+                  <a 
+                    key={idx}
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block group"
+                  >
+                    <h4 className="text-secondary group-hover:text-primary transition-colors font-sans text-sm md:text-base leading-relaxed">{item.title}</h4>
+                    <span className="text-muted text-xs font-mono mt-1 block truncate group-hover:text-gold transition-colors">{item.link}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -777,11 +895,13 @@ const Home: React.FC = () => {
            <img 
              src="https://i.postimg.cc/RhpFKdKb/LOGO-FORNO-branco-sem-fundo.png" 
              alt="O Forno" 
+             loading="lazy"
              className="h-16 md:h-24 w-auto object-contain opacity-50 mb-10 hover:opacity-100 transition-opacity block [.light_&]:hidden"
            />
            <img 
              src="https://i.postimg.cc/Dzh21XJr/logo-forno-sem-fundo.png" 
              alt="O Forno" 
+             loading="lazy"
              className="h-16 md:h-24 w-auto object-contain opacity-50 mb-10 hover:opacity-100 transition-opacity hidden [.light_&]:block"
            />
            <div className="flex flex-wrap justify-center gap-6 mb-8 text-xs font-sans font-bold tracking-widest text-muted uppercase">
@@ -806,9 +926,14 @@ const Home: React.FC = () => {
         onClose={() => setModalOpen(false)}
         title={modalTitle}
       >
-        <Forms type={modalType} onSubmit={(data) => {
-          console.log(data);
-        }} />
+        <Forms 
+          type={modalType} 
+          initialService={modalTitle}
+          onSubmit={() => {
+            // Optional: close modal automatically after a delay
+            // setTimeout(() => setModalOpen(false), 3000);
+          }} 
+        />
       </Modal>
 
       {/* Fullscreen Image Modal */}
@@ -827,6 +952,7 @@ const Home: React.FC = () => {
           <img 
             src={selectedImage} 
             alt="Fullscreen" 
+            loading="lazy"
             className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
             onClick={(e) => e.stopPropagation()}
             referrerPolicy="no-referrer"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ExternalLink, Play, Music, Youtube } from 'lucide-react';
 
 interface EmbedCardProps {
@@ -14,9 +14,7 @@ interface EmbedCardProps {
 
 const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, customThumbnail, customLinkLabel, customEmbedTitle, onImageClick }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [origin, setOrigin] = useState('');
-
-  const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
   // Helper function to extract YouTube ID
   const getYoutubeId = (link: string) => {
@@ -26,26 +24,17 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  useEffect(() => {
-    // Capture the current origin to pass to YouTube API to authorize the embed
-    if (typeof window !== 'undefined') {
-      setOrigin(window.location.origin);
-    }
-  }, []);
+  const derivedThumbnailUrl = (type === 'youtube' || type === 'video') ? 
+    `https://img.youtube.com/vi/${getYoutubeId(url || directLink)}/maxresdefault.jpg` : '';
 
-  useEffect(() => {
-    if (type === 'youtube' || type === 'video') {
-      const videoId = getYoutubeId(url || directLink);
-      if (videoId) {
-        setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`);
-      }
-    }
-  }, [type, url, directLink]);
+  const [fallbackThumbnailUrl, setFallbackThumbnailUrl] = useState('');
+
+  const thumbnailUrl = fallbackThumbnailUrl || derivedThumbnailUrl;
 
   const handleImageError = () => {
     // Fallback to hqdefault if maxresdefault fails (404)
     if (thumbnailUrl.includes('maxresdefault')) {
-      setThumbnailUrl(thumbnailUrl.replace('maxresdefault', 'hqdefault'));
+      setFallbackThumbnailUrl(thumbnailUrl.replace('maxresdefault', 'hqdefault'));
     }
   };
 
@@ -53,7 +42,7 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
     // YouTube sometimes returns a 120x90 grey placeholder image instead of a 404
     // when maxresdefault is not available. We detect this by checking the naturalWidth.
     if (e.currentTarget.naturalWidth === 120 && thumbnailUrl.includes('maxresdefault')) {
-      setThumbnailUrl(thumbnailUrl.replace('maxresdefault', 'hqdefault'));
+      setFallbackThumbnailUrl(thumbnailUrl.replace('maxresdefault', 'hqdefault'));
     }
   };
 
@@ -75,6 +64,7 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
                 <img 
                   src={thumbnailUrl}
                   alt={`Thumbnail de ${title}`}
+                  loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                   onError={handleImageError}
                   onLoad={handleImageLoad}
@@ -83,8 +73,8 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
               
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300"></div>
 
-              <div className="relative z-10 w-16 h-16 bg-primary bg-opacity-10 backdrop-blur-md rounded-full flex items-center justify-center border border-primary border-opacity-30 group-hover:scale-110 group-hover:bg-red-600 group-hover:border-red-600 transition-all duration-300 shadow-xl">
-                <Play size={32} className="text-primary fill-primary ml-1" />
+              <div className="relative z-10 w-16 h-16 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover:scale-110 group-hover:bg-red-600 group-hover:border-red-600 transition-all duration-300 shadow-xl">
+                <Play size={32} className="text-white fill-white ml-1" />
               </div>
               
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
@@ -99,6 +89,7 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
               src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=${origin}`}
               title={title}
               frameBorder="0"
+              loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
@@ -116,6 +107,7 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
         <iframe
           src={url}
           frameBorder="0"
+          loading="lazy"
           allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
           className="absolute inset-0 w-full h-full"
@@ -134,6 +126,7 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
         <img 
           src={customThumbnail}
           alt={`Thumbnail de ${title}`}
+          loading="lazy"
           className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110"
           referrerPolicy="no-referrer"
         />
@@ -156,13 +149,14 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
         <img 
           src={customThumbnail}
           alt={`Thumbnail de ${title}`}
+          loading="lazy"
           className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
         />
         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300"></div>
         
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative z-10 w-16 h-16 bg-primary bg-opacity-10 backdrop-blur-md rounded-full flex items-center justify-center border border-primary border-opacity-30 group-hover:scale-110 group-hover:bg-red-600 group-hover:border-red-600 transition-all duration-300 shadow-xl">
-            <Play size={32} className="text-primary fill-primary ml-1" />
+          <div className="relative z-10 w-16 h-16 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover:scale-110 group-hover:bg-red-600 group-hover:border-red-600 transition-all duration-300 shadow-xl">
+            <Play size={32} className="text-white fill-white ml-1" />
           </div>
         </div>
         
@@ -176,7 +170,7 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
     );
   }
 
-  const CardContent = () => (
+  const cardContent = (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 bg-border rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-colors">
@@ -201,7 +195,7 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
         rel="noopener noreferrer"
         className="group block w-full bg-surface3 border border-border hover:border-primary hover:border-opacity-50 rounded-xl p-6 my-4 transition-all duration-300"
       >
-        <CardContent />
+        {cardContent}
       </a>
     );
   }
@@ -209,7 +203,7 @@ const EmbedCard: React.FC<EmbedCardProps> = ({ type, url, directLink, title, cus
   // Non-clickable card if link is missing/dead
   return (
     <div className="group block w-full bg-surface3 border border-border rounded-xl p-6 my-4 opacity-70">
-       <CardContent />
+       {cardContent}
     </div>
   );
 };
